@@ -33,29 +33,7 @@ print requests.post(couch + '/_bulk_docs', \
 doc_multipart = requests.get(couch + '/doc').json();
 doc_multipart['_attachments']['foo.txt']['follows'] = True;
 
-BOUNDARY = '----------some-cool-boundary$'
-CRLF = '\r\n'
-L = []
-L.append('--' + BOUNDARY)
-L.append('content-type: application/json')
-L.append('')
-L.append(json.dumps(doc_multipart))
-L.append('--' + BOUNDARY)
-L.append('Content-Disposition: attachment; filename="foo.txt"')
-L.append('Content-Length: 3')
-L.append('Content-Type: text/plain')
-L.append('')
-L.append('foo')
-L.append('--' + BOUNDARY + '--')
-L.append('')
-body = CRLF.join(L)
-content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
-
-h = httplib.HTTP('127.0.0.1:5984')
-h.putrequest('PUT', '/test_multipart/doc?new_edits=false')
-h.putheader('content-type', content_type)
-h.putheader('content-length', str(len(body)))
-h.endheaders()
-h.send(body)
-errcode, errmsg, headers = h.getreply()
-print h.file.read()
+# at this point if I could figure out how to put this as a form/multipart I
+# would repro the bug, but requests sucks for doing this, and apparently
+# form/multipart is so arcane that I can't find a single Python library for
+# doing it. So fuck python.
